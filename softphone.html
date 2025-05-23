@@ -649,24 +649,24 @@ input.switchbox[type="checkbox"]+label {
 						<div>
 							<label>SERVER IP</label>
 							<div>
-								<input type="text" size="15" name="ip" id="ip" placeholder="100.100.103.160" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="port" id="port" placeholder="80" pattern="[0-9]{4}"/>
+								<input type="text" size="15" name="ip" id="ip" placeholder="CTI API 서버IP" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="port" id="port" placeholder="80" pattern="[0-9]{4}"/>
 							</div>
 						</div>
 						<div>
 							<label>AUTH ID</label>
-							<input type="text" size="22" name="id" id="id" placeholder="chiwoo@bridgetec.co.kr" pattern=""/>
+							<input type="text" size="22" name="id" id="id" placeholder="CTI로그인 계정" pattern=""/>
 						</div>
 						<div>
 							<label>AUTH PWD</label>
-							<input type="password" size="22" name="passwd" id="passwd" placeholder="****" pattern=""/>
+							<input type="password" size="22" name="passwd" id="passwd" placeholder="CTI로그인 비밀번호" pattern=""/>
 						</div>
 						<div>
 							<label>TENANT</label>
-							<input type="text" size="22" name="tenant" id="tenant" placeholder="연구1팀" pattern=""/>
+							<input type="text" size="22" name="tenant" id="tenant" placeholder="테넌트 명" pattern=""/>
 						</div>
 						<div>
 							<label>DN</label>
-							<input type="text" size="22" name="dn" id="dn" placeholder="4403" pattern=""/>
+							<input type="text" size="22" name="dn" id="dn" placeholder="로그인 내선번호" pattern=""/>
 						</div>
 					</fieldset>
 				</div>
@@ -679,13 +679,13 @@ input.switchbox[type="checkbox"]+label {
 						<div>
 							<label>SERVER IP</label>
 							<div>
-								<input type="text" size="15" name="sip-ip" id="sip-ip" placeholder="100.100.106.153" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="sip-port" id="sip-port" placeholder="5063" pattern="[0-9]{4}"/>
+								<input type="text" size="15" name="sip-ip" id="sip-ip" placeholder="SIP Server IP" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="sip-port" id="sip-port" placeholder="5063" pattern="[0-9]{4}"/>
 							</div>
 						</div>
 						<div>
 							<label>DOMAIN</label>
 							<div>
-								<input type="text" size="22" name="sip-domain" id="sip-domain" placeholder="100.100.106.153" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>
+								<input type="text" size="22" name="sip-domain" id="sip-domain" placeholder="SIP Server Domain" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>
 							</div>
 						</div>
 						<div>
@@ -694,34 +694,34 @@ input.switchbox[type="checkbox"]+label {
 						</div>
 						<div>
 							<label>TENANT</label>
-							<input type="text" size="22" name="call-tenant" id="call-tenant" placeholder="연구1팀" pattern=""/>
+							<input type="text" size="22" name="call-tenant" id="call-tenant" placeholder="테넌트 명" pattern=""/>
 						</div>
 						<div>
 							<label>DN</label>
-							<input type="text" size="22" name="call-dn" id="call-dn" placeholder="4403" pattern=""/>
+							<input type="text" size="22" name="call-dn" id="call-dn" placeholder="내선번호" pattern=""/>
 						</div>
 						<div>
 							<label>ICE-1</label>
 							<div>
-								<input type="text" size="15" name="ice-ip1" id="ice-ip1" placeholder="100.100.107.123" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="ice-port1" id="ice-port1" placeholder="3478" pattern="[0-9]{4}"/>
+								<input type="text" size="15" name="ice-ip1" id="ice-ip1" placeholder="ICE 서버1" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="ice-port1" id="ice-port1" placeholder="3478" pattern="[0-9]{4}"/>
 							</div>
 						</div>
 						<div>
 							<label></label>
 							<div>
-								<input type="text" size="9" name="ice-id1" id="ice-id1" placeholder="ipron" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>/<input type="text" size="10" name="ice-pwd1" id="ice-pwd1" placeholder="webrtc" pattern="[0-9]{4}"/>
+								<input type="text" size="9" name="ice-id1" id="ice-id1" placeholder="ICE 계정ID" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>/<input type="text" size="10" name="ice-pwd1" id="ice-pwd1" placeholder="ICE 계정비밀번호" pattern="[0-9]{4}"/>
 							</div>
 						</div>
 						<div>
 							<label>ICE-2</label>
 							<div>
-								<input type="text" size="15" name="ice-ip2" id="ice-ip2" placeholder="100.100.107.124" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="ice-port2" id="ice-port2" placeholder="3478" pattern="[0-9]{4}"/>
+								<input type="text" size="15" name="ice-ip2" id="ice-ip2" placeholder="ICE 서버2" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="ice-port2" id="ice-port2" placeholder="3478" pattern="[0-9]{4}"/>
 							</div>
 						</div>
 						<div>
 							<label></label>
 							<div>
-								<input type="text" size="9" name="ice-id2" id="ice-id2" placeholder="ipron" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>/<input type="text" size="10" name="ice-pwd2" id="ice-pwd2" placeholder="webrtc" pattern="[0-9]{4}"/>
+								<input type="text" size="9" name="ice-id2" id="ice-id2" placeholder="ICE 계정ID" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>/<input type="text" size="10" name="ice-pwd2" id="ice-pwd2" placeholder="ICE 계정비밀번호" pattern="[0-9]{4}"/>
 							</div>
 						</div>
 						<div id="media-srouce" hidden disabled>
