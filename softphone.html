@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>IPRON Browser Phone</title>
+
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script src="js/ipron.js"></script>
+		<script src="js/softphone-ui.js"></script>
+		<script src="js/ipron-ne-softphone.js"></script>
+		<script src="js/ipron-ne-callphone.js"></script>
+
+		<style>
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,200,0..1,0');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+.material-symbols-outlined {
+	font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+:root {
+	--primary-color: #007bff;
+	--secondary-color: #6c757d;
+	--success-color: #28a745;
+	--danger-color: #dc3545;
+	--warning-color: #ffc107;
+	--info-color: #17a2b8;
+	--disabled-color: #efefef;
+	--light-color: #f8f9fa;
+	--dark-color: #343a40;
+	--border-color: #ced4da;
+
+	--spacing-unit: 4px; /* 전체 화면 여백 */
+	--main-margin-size: 5px; /* main창 양쪽 옆 여백 */
+	--legend-spacing-unit: 4px;
+	--phone-width: 310px; /* 적절한 기본 너비 설정 */
+	--panel-bg-color: #fff;
+	--panel-border-color: gray;
+	--panel-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+	--icon-size: 20px; /* 아이콘 크기 변수 */
+	--call-icon-size: 15px; /* 아이콘 크기 변수 */
+	--button-text-gap: 5px;
+	--placeholder-font-size: smaller;
+
+	/** SWITCH CHECKBOX **/
+	--switch-width: 60px;
+   --switch-height-size: 25px; /* 아이콘 크기 변수 */
+   --switch-ball-size: 20px; /* 아이콘 크기 변수 */
+   --switch-ball-gap: 2.5px;
+   --switch-ball-color: var(--primary-color);
+}
+
+/* Material Icons 기본 스타일 */
+.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: var(--icon-size); /* 아이콘 크기 변수 사용 */
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	display: inline-block;
+	white-space: nowrap;
+	word-wrap: normal;
+	direction: ltr;
+	-webkit-font-feature-settings: 'liga';
+	-webkit-font-smoothing: antialiased;
+	/* vertical-align: middle; /* 세로 정렬 */
+}
+
+body {
+	margin: 0px;
+}
+
+#phone {
+	position: relative;
+	font-family: 'Roboto Mono', monospace;
+	width: var(--phone-width);
+/*	top: 30px; */
+}
+
+/************/
+/* 설정 패널 */
+/************/
+
+.setting {
+	display: none;
+}
+
+.setting.on {
+	display: block;
+}
+
+/* =================
+   SETTING TAB 스타일
+   ================= */
+
+.tabs {
+  position: static;
+  overflow: hidden;
+  border: none;
+  border-bottom: 1px solid lightgray;
+  margin: var(--spacing-unit) 0 var(--spacing-unit) calc(var(--spacing-unit) + var(--main-margin-size));
+}
+
+.tabs button {
+  display: flex;
+  align-items: center;
+
+  background-color: inherit;
+  float: left;
+  border: none;
+  border-radius: 3px 3px 0 0;
+  outline: none;
+  cursor: pointer;
+  padding: 5px 15px;
+  transition: 0.3s;
+  color: black;
+  font-size: small;
+}
+
+.tabs button:hover {
+  background-color: #ddd;
+}
+
+.tabs button.active {
+  background-color: #ccc;
+}
+
+.tabcontent {
+  display: none;
+}
+
+.tabcontent.on {
+	display: block;
+}
+
+/* =================
+   SETTING PANEL 스타일
+   ================= */
+
+.setting-panel { /* #setting 대신 클래스 사용 */
+	position: static;
+	top: 0; /* 상단 정렬 */
+	left: 0; /* 좌측 정렬 */
+	width: 100%; /* 부모 너비에 맞춤 */
+	/* height: 100%; */ /* 부모 높이에 맞춤 */
+	background: rgba(255, 255, 255, 0.98); /* 반투명 배경 (투명도 약간 줄임) */
+	z-index: 10; /* 메인 다이얼로그 위로 */
+	margin: var(--spacing-unit);
+	box-sizing: border-box; /* 패딩을 너비에 포함 */
+	overflow-y: auto; /* 내용이 많으면 스크롤 */
+}
+
+/* 설정 패널 그룹 타이틀 */
+.setting-panel legend {
+	padding: 0 var(--legend-spacing-unit);
+	font-size: small;
+	font-weight: bold;
+}
+
+/* 설정 패널 입력셋 */
+.setting-panel fieldset {
+	border: 1px solid var(--border-color);
+	margin: var(--main-margin-size);
+	border-radius: 4px;
+}
+
+
+/* 설정 패널 입력항목별 Label/Input 셋 */
+.setting-panel fieldset > div {
+	display: flex;
+	align-items: center;
+}
+
+/* 설정 패널 입력항목별 Label */
+.setting-panel label {
+	display:inline-block;
+	width:30%;
+	text-align:right;
+	margin: 5px 5px 5px 0;
+
+	font-size: smaller;
+	font-weight: bold;
+}
+
+/* 설정 패널 입력항목별 Input */
+.setting-panel input[type="text"],
+.setting-panel input[type="password"] {
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	font-size: smaller;
+}
+
+/* 설정 패널 입력항목별 Input 설명 */
+.setting-panel input[type="text"]::placeholder,
+.setting-panel input[type="password"]::placeholder {
+	color: #aaaaaa;
+}
+
+
+
+/****************
+ * 로그인 버튼
+ ****************/
+
+/* 로그인버튼 그룹 */
+.setting .buttons {
+	display: grid;
+	margin: 0 0 0 calc(var(--spacing-unit) + var(--main-margin-size));
+}
+
+/* 로그인버튼 기본속성 */
+.setting .buttons button {
+	padding-top: var(--button-text-gap);
+	padding-bottom: var(--button-text-gap);
+	border: none;
+	border-radius: 4px;
+	background-color: var(--primary-color);
+	color: white;
+	font-size: medium;
+	cursor: pointer;
+	margin-top: var(--spacing-unit);
+	transition: background-color 0.2s ease-in-out;
+
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* 로그인버튼 마우스 오버 */
+.setting button:hover {
+	background-color: #0056b3;
+}
+
+/* 로그인버튼 비활성화 스타일 */
+.setting button:disabled {
+	background-color: var(--disabled-color);
+	color: darkgray;
+}
+
+/* 로그인버튼 머티리얼 아이콘 */
+.setting button>span {
+	margin-right: 3px;
+}
+
+/************/
+/* Main 패널 */
+/************/
+
+.main-panel {
+	display: none;
+	position: static;
+	top: 0; /* 상단 정렬 */
+	left: 0; /* 좌측 정렬 */
+	width: 100%; /* 부모 너비에 맞춤 */
+	/* height: 100%; */ /* 부모 높이에 맞춤 */
+	z-index: 1; /* 메인 다이얼로그 위로 */
+	margin: var(--spacing-unit);
+	box-sizing: border-box; /* 패딩을 너비에 포함 */
+	overflow-y: auto; /* 내용이 많으면 스크롤 */
+	border: 1px solid var(--border-color);
+	border-radius: 4px;	
+	background: rgba(255, 255, 255, 0.98); /* 반투명 배경 (투명도 약간 줄임) */
+}
+
+.main-panel.on {
+	display: block;
+}
+
+.main-panel #logout-btn {
+	all: initial;
+	border: none;
+	outline: none;
+	background-color: inherit ;
+	float: right;
+	cursor: pointer;
+	margin-right: var(--main-margin-size);
+}
+
+.main-panel #logout-btn span {
+	font-size: medium;
+	vertical-align: -webkit-baseline-middle;
+}
+
+/* ===============================
+   로그인 사용자 정보 표시 블록 스타일
+   =============================== */
+
+#userinfo-block {
+	display: inline-block;
+}
+
+/* -----------------------
+   PRESENCE LED 표시 스타일
+   ----------------------- */
+#presence-led {
+	display: inline-block;
+	cursor: pointer;
+	padding-left: var(--main-margin-size);
+	width: 15px;
+}
+
+#presence-led span {
+	color: red; /* Or a color you prefer */
+	vertical-align: middle;
+	font-size: var(--icon-size);
+}
+
+#presence-led.regi span {
+	color: orange; /* Or a color you prefer */
+}
+
+#presence-led.login span {
+	color: green; /* Or a color you prefer */
+}
+
+/* -----------------------
+   로그인 사용자 정보 표시 스타일
+   ----------------------- */
+
+#user-info {
+	display: inline-block;
+	font-size: small;
+}
+
+/* ----------------------
+   로컬 내선번호 표시 스타일 
+   ---------------------- */
+#local-num {
+	text-align: left;
+	display: inline-block;
+	width: calc(60%);
+	margin-left: var(--main-margin-size);
+	padding-left: calc(var(--icon-size) + 5px);
+}
+
+/* ===============================
+   착신지 정보 블록 스타일
+   =============================== */
+
+/* ----------------------
+   착신번호 입력 블록 스타일
+   ---------------------- */
+#dialpad-block {
+	text-align: left;
+	display: inline-block;
+	width: calc(60%);
+	margin-left: var(--main-margin-size);
+}
+
+#dialpad-block div {
+	display: inline-block;
+}
+
+/* ----------------------
+   착신번호 입력 버튼 스타일
+   ---------------------- */
+#dialpad-btn {
+	display: inline-block;
+	width: 15px;
+	cursor: pointer;
+}
+
+#dialpad-btn span {
+	font-size: var(--icon-size);
+	vertical-align: middle;
+}
+
+/* ----------------------
+   착신번호 입력 박스 스타일
+   ---------------------- */
+#dest-num {
+	display: inline-block;
+	border: none;
+	border-bottom: solid #aaaaaa 1px;
+	padding: 0;
+	font-family: 'Roboto Mono', monospace;
+	font-size: medium;
+	width: 70%;
+}
+
+#dest-num:focus { 
+	outline: none;
+}
+
+#dest-num::placeholder { 
+	color: #aaaaaa;
+	font-size: var(--placeholder-font-size);
+	font-style: italic;
+}
+
+/* ----------------------
+   콜 상태표시 스타일
+   ---------------------- */
+
+#callstatus-block {
+	float: right;
+	display: inline-block;
+	font-size: smaller;
+	margin-right: var(--main-margin-size);
+}
+
+/* =====================
+   콜 제어 버튼 블록 스타일
+   ===================== */
+
+#call-buttons {
+	display: flex;
+	flex-direction: row;
+	margin: var(--main-margin-size);
+}
+
+#call-buttons button {
+	margin: 0px 1px;
+}
+
+#call-buttons button .material-icons {
+	font-size: var(--call-icon-size); /* 아이콘 크기 변수 사용 */
+	vertical-align: middle;
+}
+
+/* =====================
+   상담사 상태 표시 스타일
+   ===================== */
+
+#presence-status {
+	display: block;
+	position: absolute;
+	align-items: center;
+	text-align: center;
+	height: 20px;
+	width: 100%;
+}
+
+#presence-status span {
+	display: inline-block;
+	font-size: smaller;
+	width: 100%;
+}
+
+/* ********************
+   다이얼 패드 블록 스타일
+   ******************** */
+
+#dialpad {
+	display: none;	
+	position: absolute;
+	top: 70px;
+	left: calc(var(--spacing-unit) + var(--main-margin-size));
+	z-index: 99;
+	background-color: white;
+	border: 1px solid gray;
+	border-radius: 4px;
+	box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.4);
+}
+
+#dialpad.on {
+	display: flex;
+	flex-direction: column;	
+}
+
+#dialpad table {
+	all: unset;
+	display: inline-table;
+	position: static;
+	top: 0px;
+
+	background-color: white;
+	/* transform: translate(0.3em, 2.5em); */
+	background:#fff;
+	border:1px solid var(--border-color);
+	border-radius: 4px;
+}
+
+#dialpad table,tr,td {
+	border-spacing: 0 0;
+	text-align: center;
+}
+
+#dialpad td {
+	border-spacing: 0 0;
+	box-shadow: 0px 0px 1px gray;
+}
+
+#dialpad td:hover {
+	border-spacing: 0 0;
+	box-shadow: 0px 0px 1px gray;
+	background-color: orange;
+}
+
+#dialpad button {
+	font-family: 'Roboto Mono', monospace;
+	font-size: medium;
+	background-color: transparent;
+	border-color: transparent;
+	outline: none;
+	width: -webkit-fill-available;
+	min-width: 50px;
+	cursor: pointer;
+}
+
+/* ***********************
+   PRESENCE 상태 블록 스타일
+   *********************** */
+
+#presence-select {
+	display: block;
+	position: absolute;
+	z-index: 99;
+	top: 10px;
+	left: calc(var(--spacing-unit) + var(--main-margin-size));
+	font-size: smaller;
+}
+
+
+#presence-select #status-list {
+	display: none;
+	position: absolute;
+	width: min-content;
+	overflow: auto;
+	box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.4);
+	background:#fff;
+	padding: 0px;
+	border:1px solid gray;
+	border-radius: 4px;
+}
+
+#presence-select #status-list.on {
+	display: block;
+}
+
+#presence-select #status-list li {
+	display: block;
+	color: #000000;
+	padding: 5px;
+	text-decoration: none;	
+	cursor: pointer;
+}
+
+#presence-select #status-list li:hover {
+	color: #FFFFFF;
+	background-color: #00A4BD;
+}
+
+/* ***********************
+   MESSAGE 상태 블록 스타일
+   *********************** */
+
+.message-panel {
+	position: relative;
+	z-index: 10;
+	margin: var(--spacing-unit);
+	box-sizing: border-box;
+}
+
+.message-panel #message-info {
+	font-size: smaller;
+}
+
+#media-srouce[hidden] {
+	display: none;
+}
+
+/* ***********************
+   SWITCH ON/OFF 스타일
+   *********************** */
+
+/*  on/off토글  */
+input.switchbox[type="checkbox"] {
+	display: inline-block;
+	position: relative;
+	vertical-align: middle;
+	width: var(--switch-width);
+	height: var(--switch-height-size);
+	margin: 3px 3px 3px 4px;
+	background: #d3d3d3;
+	border-radius: calc(var(--switch-height-size) / 2);
+	transition: background 0.4s;
+}
+
+/* 내부 볼 기본상태 */
+input.switchbox[type="checkbox"]::after {
+	content: "";
+	position: absolute;
+	left: var(--switch-ball-gap);
+	top: 50%;
+	width:  var(--switch-ball-size);
+	height: var(--switch-ball-size);
+	border-radius: 100%;
+	background-color: #fff;
+	transform: translateY(-50%);
+	box-shadow: 1px 3px 4px rgba(0,0,0,0.1);
+	transition: all 0.4s;
+}
+
+/* 내부 볼 OFF상태 */
+input.switchbox[type="checkbox"]::before {
+	content: "OFF";
+	font-size: calc(var(--switch-height-size) / 2);
+	font-family: Arial, Helvetica, sans-serif;
+	position: absolute;
+	left: var(--switch-height-size);
+	top: 50%;
+	transform: translateY(-50%);
+	transition: all 0.4s;
+}
+/* 스위치(체크박스)가 토글(체크)되었을 때 */
+input.switchbox[type="checkbox"]:checked {
+	background: var(--switch-ball-color);
+}
+input.switchbox[type="checkbox"]:checked::after {
+	left: calc(100% - calc(var(--switch-ball-size) + var(--switch-ball-gap)));
+}
+input.switchbox[type="checkbox"]:checked::before {
+	content: "ON";
+	color: #fff;
+	left: calc(var(--switch-height-size) / 2);
+}
+input.switchbox[type="checkbox"] {
+	appearance: none;
+}
+
+input.switchbox[type="checkbox"]+label {
+	font-size: smaller;
+	vertical-align: middle;
+	line-height: var(--switch-height-size);
+	position: absolute;
+	margin: 3px 3px 3px 4px;
+}
+
+
+		</style>
+	</head>
+	<body>
+		<div id="phone">
+			<div id="setting" class="setting">
+				<div id="setting-tab" class="tabs">
+					<button class="tablink" data-tab="softphone-setting" onclick="OpenSettingTab(this)"><span class="material-icons">support_agent</span> CTI</button>
+					<button class="tablink" data-tab="callphone-setting" onclick="OpenSettingTab(this)"><span class="material-icons">dialer_sip</span> PHONE</button>
+				</div>
+				<div id="softphone-setting" class="tabcontent setting-panel">
+					<fieldset>
+						<legend align="center">
+							<input type="checkbox" id="softphone-use" name="softphone-use"/>
+							Softphone
+						</legend>
+						<div>
+							<label>SERVER IP</label>
+							<div>
+								<input type="text" size="15" name="ip" id="ip" placeholder="100.100.103.160" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="port" id="port" placeholder="80" pattern="[0-9]{4}"/>
+							</div>
+						</div>
+						<div>
+							<label>AUTH ID</label>
+							<input type="text" size="22" name="id" id="id" placeholder="chiwoo@bridgetec.co.kr" pattern=""/>
+						</div>
+						<div>
+							<label>AUTH PWD</label>
+							<input type="password" size="22" name="passwd" id="passwd" placeholder="****" pattern=""/>
+						</div>
+						<div>
+							<label>TENANT</label>
+							<input type="text" size="22" name="tenant" id="tenant" placeholder="연구1팀" pattern=""/>
+						</div>
+						<div>
+							<label>DN</label>
+							<input type="text" size="22" name="dn" id="dn" placeholder="4403" pattern=""/>
+						</div>
+					</fieldset>
+				</div>
+				<div id="callphone-setting" class="tabcontent setting-panel">
+					<fieldset>
+						<legend align="center">
+							<input type="checkbox" id="callphone-use" name="callphone-use"/>
+							CallPhone
+						</legend>
+						<div>
+							<label>SERVER IP</label>
+							<div>
+								<input type="text" size="15" name="sip-ip" id="sip-ip" placeholder="100.100.106.153" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="sip-port" id="sip-port" placeholder="5063" pattern="[0-9]{4}"/>
+							</div>
+						</div>
+						<div>
+							<label>DOMAIN</label>
+							<div>
+								<input type="text" size="22" name="sip-domain" id="sip-domain" placeholder="100.100.106.153" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>
+							</div>
+						</div>
+						<div>
+							<label>REG EXPIRE</label>
+							<input type="text" size="5" name="sip-regexpire" id="sip-regexpire" placeholder="180" pattern="[0-9]{1,4}"/>
+						</div>
+						<div>
+							<label>TENANT</label>
+							<input type="text" size="22" name="call-tenant" id="call-tenant" placeholder="연구1팀" pattern=""/>
+						</div>
+						<div>
+							<label>DN</label>
+							<input type="text" size="22" name="call-dn" id="call-dn" placeholder="4403" pattern=""/>
+						</div>
+						<div>
+							<label>ICE-1</label>
+							<div>
+								<input type="text" size="15" name="ice-ip1" id="ice-ip1" placeholder="100.100.107.123" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="ice-port1" id="ice-port1" placeholder="3478" pattern="[0-9]{4}"/>
+							</div>
+						</div>
+						<div>
+							<label></label>
+							<div>
+								<input type="text" size="9" name="ice-id1" id="ice-id1" placeholder="ipron" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>/<input type="text" size="10" name="ice-pwd1" id="ice-pwd1" placeholder="webrtc" pattern="[0-9]{4}"/>
+							</div>
+						</div>
+						<div>
+							<label>ICE-2</label>
+							<div>
+								<input type="text" size="15" name="ice-ip2" id="ice-ip2" placeholder="100.100.107.124" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>:<input type="text" size="4" name="ice-port2" id="ice-port2" placeholder="3478" pattern="[0-9]{4}"/>
+							</div>
+						</div>
+						<div>
+							<label></label>
+							<div>
+								<input type="text" size="9" name="ice-id2" id="ice-id2" placeholder="ipron" pattern="[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"/>/<input type="text" size="10" name="ice-pwd2" id="ice-pwd2" placeholder="webrtc" pattern="[0-9]{4}"/>
+							</div>
+						</div>
+						<div id="media-srouce" hidden disabled>
+							<div class="select">
+								<label id="aslabel" for="audioSource">Audio input source:</label>
+								<select id="audioSource" onchange="changeAudioSource()"></select>
+							</div>
+							<div class="select">
+								<label id="aolabel" for="audioOutput">Audio output destination:</label>
+								<select id="audioOutput" onchange="changeAudioOutput()"></select>
+							</div>
+						</div>
+					</fieldset>
+				</div>
+				<div class="buttons">
+					<button id="login-btn" type="button" value="로그인" onclick="Login()"><span class="material-icons">login</span>로그인</button>
+				</div>
+			</div>
+			<div id="main" class="main-panel">
+				<div id="userinfo-block">
+					<div id="presence-led" onclick="ShowPresencePad()">
+						<span class="material-symbols-outlined">circle</span>
+					</div>
+					<span id="user-info">...</span>
+				</div>
+				<button id="logout-btn" type="button" onclick="Logout()" title="로그아웃">
+					<span class="material-icons">logout</span>
+				</button>
+				<div id="local-num">0000</div>
+				<div id="dialpad-block">
+					<div id="dialpad-btn" onclick="ShowDialPad()">
+						<span class="material-icons">dialpad</span>
+					</div>
+					<input id="dest-num" placeholder="착신번호 입력"></input>
+				</div>
+				<div id="callstatus-block">
+					<span id="callstatus"></span>
+				</div>
+				<!-- 콜제어용 버튼 목록 -->
+				<div id="call-buttons">
+					<button id="call" type="button" disabled>
+						<span class="material-icons">call</span>
+						<span>발신</span>
+					</button>
+					<button id="hold" type="button" disabled>
+						<span class="material-icons">mic_off</span>
+						<span>보류</span>
+					</button>
+					<button id="unhold" type="button" disabled>
+						<span class="material-icons">mic</span>
+						<span>해제</span>
+					</button>
+					<button id="answer" type="button" disabled>
+						<span class="material-icons">phone_in_talk</span>
+						<span>수신</span>
+					</button>
+					<button id="end" type="button" disabled>
+						<span class="material-icons">call_end</span>
+						<span>종료</span>
+					</button>
+					<button id="trans" type="button" disabled>
+						<span class="material-icons">swap_calls</span>
+						<span>전환</span>
+					</button>
+					<button id="conf" type="button" disabled>
+						<span class="material-icons">group</span>
+						<span>회의</span>
+					</button>
+					<button id="etc" type="button" disabled>
+						<span class="material-icons">more_horiz</span>
+					</button>
+				</div>
+				<div id="presence-status">
+					<span id="presencestatus">NotReady</span>
+				</div>
+			</div>
+			<!-- 착신번호 입력용 다이얼패드 -->
+			<div id="dialpad" class="dialpad">
+				<div>
+					<input type="checkbox" id="dtmf-use" class="switchbox">
+					<label for="dtmf-use">DTMF송출</label>
+				</div>
+				<table>
+					<tr>
+						<td><button id="clear" type="button" onclick="SetDialpad('C')">
+							<span class="material-symbols-outlined">remove</span>
+						</button></td>
+						<td><button id="close" type="button" onclick="ShowDialPad(false)">
+							<span class="material-symbols-outlined">close</span>
+						</button></td>
+						<td><button id="del"   type="button" onclick="SetDialpad('D')">
+							<span class="material-symbols-outlined">backspace</span>
+						</button></td>
+					</tr>
+					<tr>
+						<td><button id="d1" type="button" onclick="SetDialpad('1')">1</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('2')">2</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('3')">3</button></td>
+					</tr>
+					<tr>
+						<td><button id="d2" type="button" onclick="SetDialpad('4')">4</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('5')">5</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('6')">6</button></td>
+					</tr>
+					<tr>
+						<td><button id="d2" type="button" onclick="SetDialpad('7')">7</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('8')">8</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('9')">9</button></td>
+					</tr>
+					<tr>
+						<td><button id="d2" type="button" onclick="SetDialpad('*')">*</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('0')">0</button></td>
+						<td><button id="d2" type="button" onclick="SetDialpad('#')">#</button></td>
+					</tr>
+				</table>
+			</div>
+			<!-- 상담사 상태 변경용 Select Box -->
+			<div id="presence-select">
+				<ul id="status-list">
+					<li id="notready" onclick="OnClickPresenceChange('NotReady')">NotReady</li>
+					<li id="ready" onclick="OnClickPresenceChange('Ready')">Ready</li>
+					<li id="inready" onclick="OnClickPresenceChange('InReady')">InReady</li>
+					<li id="outready" onclick="OnClickPresenceChange('OutReady')">OutReady</li>
+					<li id="acw" onclick="OnClickPresenceChange('AfterCallWork')">AfterCallWork</li>
+				</ul>
+			</div>
+			<div id="message" class="message-panel" align="center">
+				<span id="message-info">...</span>
+			</div>
+		</div>
+		<script>
+			var popupPad = ""
+			var isSoftPhone = true;
+			var isCallPhone = true;
+
+			/*****************
+			 * 기본 화면 초기화
+			 *****************/
+
+			// 미사용 Phone유형 설정창 비활성화
+			if (!isSoftPhone) DisableSettingTab("softphone-setting");
+			if (!isCallPhone) DisableSettingTab("callphone-setting");
+
+			LoadUsePhoneLocalStorage()
+
+			// 초기 표시 Phone 설정 Panel 표시
+			ActiveSettingTab(IsSoftPhone()?"softphone-setting":"callphone-setting");
+
+			// 여러 설정 Panel 내 동일 데이터 입력 동기화
+			SyncSettingInput('tenant', 'call-tenant');
+			SyncSettingInput('dn', 'call-dn');
+
+			// 설정 Pandel 표시
+			ShowPanel("setting");
+
+			EnableDTMFSendMode(false)
+
+			/*****************
+			 * 화면 처리용 함수
+			 *****************/
+
+			function IsSoftPhone() {
+				return isSoftPhone && IsUsePhoneKind("softphone-use")
+			}
+
+			function IsCallPhone() {
+				return isCallPhone && IsUsePhoneKind("callphone-use")
+			}
+
+			function SetUsePhoneKind(kind, use) {
+				let el = document.getElementById(kind)
+				el.checked = use;
+			}
+
+			function IsUsePhoneKind(kind) {
+				let el = document.getElementById(kind)
+				return el.checked
+			}
+
+			function EnableDTMFSendMode(mode) {
+				let el_dn = document.getElementById("dtmf-use") 
+				el_dn.disabled = !mode
+			}
+
+			function ShowPanel(id)
+			{
+				switch (id) {
+				case "setting":
+					document.getElementById("setting").classList.add('on');
+					document.getElementById("main").classList.remove('on');
+					break;
+				case "main":
+					document.getElementById("setting").classList.remove('on');
+					document.getElementById("main").classList.add('on');
+					break;
+				}
+			}
+
+			// Setting Tab 표시 제어
+			function ActiveSettingTab(tab) {
+				const tabs = document.querySelectorAll('#setting-tab .tablink');
+
+				tabs.forEach(function(el){
+					let contentEl = document.getElementById(el.dataset.tab)
+
+					if (el.dataset.tab == tab) {
+						el.classList.add('active');
+						contentEl.classList.add('on')
+					} else {
+						el.classList.remove('active');
+						contentEl.classList.remove('on')
+					}
+				});
+			}
+
+			// Setting Tab 활성화 제어
+			function DisableSettingTab(tab) {
+				const tabs = document.querySelectorAll('#setting-tab .tablink');
+
+				tabs.forEach(function(el){
+					if (el.dataset.tab == tab) {
+						el.disabled = true
+					}
+				});
+			}
+
+			// Setting Tab 선택으로 전환 제어
+			function OpenSettingTab(self) {
+				let tabcontent = document.getElementsByClassName("tabcontent");
+				const activeEl = document.querySelectorAll('.tabs button.active');
+
+				activeEl.forEach(function(el){
+					el.classList.remove('active');
+					let contentEl = document.getElementById(el.dataset.tab)
+					contentEl.classList.remove('on')
+				});
+
+				self.classList.add('active')
+				let contentEl = document.getElementById(self.dataset.tab)
+				contentEl.classList.add('on')
+			}
+
+			function LoadUsePhoneLocalStorage() {
+				useCallPhone = window.localStorage.getItem('USE-CALLPHONE')
+				useSoftPhone = window.localStorage.getItem('USE-SOFTPHONE')
+
+				switch (useCallPhone){
+				case "":  useCallPhone = isCallPhone; break;
+				case "1": useCallPhone = true; break;
+				case "0": useCallPhone = false; break;
+				}
+
+				switch (useSoftPhone){
+				case "":  useSoftPhone = isSoftPhone; break;
+				case "1": useSoftPhone = true; break;
+				case "0": useSoftPhone = false; break;
+				}
+
+				SetUsePhoneKind("softphone-use", useSoftPhone)
+				SetUsePhoneKind("callphone-use", useCallPhone)
+			}
+
+			function SaveUsePhoneLocalStorage() {
+				window.localStorage.setItem( 'USE-CALLPHONE', IsCallPhone()?"1":"0");
+				window.localStorage.setItem( 'USE-SOFTPHONE', IsSoftPhone()?"1":"0");
+			}
+
+			function LoadCTILocalStorage() {
+				document.getElementById('ip').value = window.localStorage.getItem('IP');
+				document.getElementById('port').value = window.localStorage.getItem('PORT');
+				document.getElementById('id').value = window.localStorage.getItem('ID');
+				document.getElementById('passwd').value = window.localStorage.getItem('PWD');
+
+				document.getElementById('tenant').value = window.localStorage.getItem('TENANT');
+				document.getElementById('dn').value = window.localStorage.getItem('DN');
+			}
+
+			function SaveCTILocalStorage() {
+				window.localStorage.setItem( 'IP', document.getElementById('ip').value);
+				window.localStorage.setItem( 'PORT', document.getElementById('port').value);
+				window.localStorage.setItem( 'ID', document.getElementById('id').value);
+				window.localStorage.setItem( 'PWD', document.getElementById('passwd').value);
+
+				window.localStorage.setItem( 'TENANT', document.getElementById('tenant').value);
+				window.localStorage.setItem( 'DN', document.getElementById('dn').value);
+			}
+
+			function LoadPhoneLocalStorage() {
+				document.getElementById('sip-ip').value = window.localStorage.getItem('SIP-IP');
+				document.getElementById('sip-port').value = window.localStorage.getItem('SIP-PORT');
+				document.getElementById('sip-domain').value = window.localStorage.getItem('SIP-DOMAIN');
+				document.getElementById('sip-regexpire').value = window.localStorage.getItem('SIP-REGEXPIRE');
+				document.getElementById('ice-ip1').value = window.localStorage.getItem('ICE-IP1');
+				document.getElementById('ice-port1').value = window.localStorage.getItem('ICE-PORT1');
+				document.getElementById('ice-ip2').value = window.localStorage.getItem('ICE-IP2');
+				document.getElementById('ice-port2').value = window.localStorage.getItem('ICE-PORT2');
+				document.getElementById('ice-id1').value = window.localStorage.getItem('ICE-ID1');
+				document.getElementById('ice-pwd1').value = window.localStorage.getItem('ICE-PWD1');
+				document.getElementById('ice-id2').value = window.localStorage.getItem('ICE-ID2');
+				document.getElementById('ice-pwd2').value = window.localStorage.getItem('ICE-PWD2');
+
+				document.getElementById('call-tenant').value = window.localStorage.getItem('TENANT');
+				document.getElementById('call-dn').value = window.localStorage.getItem('DN');
+			}
+
+			function SavePhoneLocalStorage() {
+				window.localStorage.setItem( 'SIP-IP', document.getElementById('sip-ip').value);
+				window.localStorage.setItem( 'SIP-PORT', document.getElementById('sip-port').value);
+				window.localStorage.setItem( 'SIP-DOMAIN', document.getElementById('sip-domain').value);
+				window.localStorage.setItem( 'SIP-REGEXPIRE', document.getElementById('sip-regexpire').value);
+				window.localStorage.setItem( 'ICE-IP1', document.getElementById('ice-ip1').value);
+				window.localStorage.setItem( 'ICE-PORT1', document.getElementById('ice-port1').value);
+				window.localStorage.setItem( 'ICE-IP2', document.getElementById('ice-ip2').value);
+				window.localStorage.setItem( 'ICE-PORT2', document.getElementById('ice-port2').value);
+				window.localStorage.setItem( 'ICE-ID1', document.getElementById('ice-id1').value);
+				window.localStorage.setItem( 'ICE-PWD1', document.getElementById('ice-pwd1').value);
+				window.localStorage.setItem( 'ICE-ID2', document.getElementById('ice-id2').value);
+				window.localStorage.setItem( 'ICE-PWD2', document.getElementById('ice-pwd2').value);
+
+				window.localStorage.setItem( 'TENANT', document.getElementById('call-tenant').value);
+				window.localStorage.setItem( 'DN', document.getElementById('call-dn').value);
+			}
+
+			function SyncSettingInput(src1, src2) {
+				const input1 = document.getElementById(src1);
+				const input2 = document.getElementById(src2);
+				let isSyncing = false;
+
+				input1.addEventListener('input', () => {
+					if (isSyncing) return;
+
+					isSyncing = true;
+					input2.value = input1.value;
+					isSyncing = false;
+				});
+
+				input2.addEventListener('input', () => {
+					if (isSyncing) return;
+
+					isSyncing = true;
+					input1.value = input2.value;
+					isSyncing = false;
+				});
+			}
+
+			/*****************
+			 * 화면 정보 표출 함수
+			 *****************/
+
+			function SetLoginButtonStatus(enable) {
+				let el_loginbtn = document.getElementById("login-btn")
+				el_loginbtn.disabled = !enable
+			}
+
+			function SetUserInfo(user) {
+				let el_user = document.getElementById("user-info") 
+				el_user.textContent = user;
+			}
+
+			function SetMessage(status) {
+				let el = document.getElementById("message-info") 
+				el.textContent = status; 
+			}
+
+			function SetCallStatus(status) {
+				let el = document.getElementById("callstatus") 
+				el.textContent = status;					
+			}
+
+			function SetPresenceStatus(status) {
+				let el = document.getElementById("presencestatus") 
+				el.textContent = status; 
+			}
+
+			function SetLocalNumber(num) {
+				let el_dn = document.getElementById("local-num") 
+				el_dn.textContent = num;
+			}
+
+			function SetPresenceLED(status) {
+				let el = document.getElementById("presence-led") 
+
+				el.classList.value = ""
+
+				switch (status)
+				{
+				case "login":
+					el.classList.add('login');
+					break;
+				case "regi":
+					el.classList.add('regi');
+					break;
+				case "":
+					break;
+				}
+			}
+
+			/*****************
+			 * 다이얼 패드 제어
+			 *****************/
+
+			// 다이얼 패드 표시 제어
+			function ShowDialPad(visable)
+			{
+				switch (visable) {
+				case undefined:
+					document.getElementById("dialpad").classList.toggle('on');
+					break;
+				case true:
+					document.getElementById("dialpad").classList.add('on');
+					break;
+				case false:
+					document.getElementById("dialpad").classList.remove('on');
+					break;
+				}
+
+				if (document.getElementById("dialpad").classList.contains("on")) {
+					popupPad = "dialpad"
+				}
+			}
+
+			/**************************
+			 * 상담사 상태 변경 패드 제어
+			 **************************/
+
+			// 상담사 상태변경 목록 표시 제어
+			function ShowPresencePad(visable)
+			{
+				if (!softPhone.IsLogin()) return
+
+				switch (visable) {
+				case undefined:
+					document.getElementById("status-list").classList.toggle('on');
+					break;
+				case true:
+					document.getElementById("status-list").classList.add('on');
+					break;
+				case false:
+					document.getElementById("status-list").classList.remove('on');
+					break;
+				}
+
+				if (document.getElementById("status-list").classList.contains("on")) {
+					popupPad = "status-list"
+				}
+			}
+
+			/**************************
+			 * 화면 버튼 Action 함수
+			 **************************/
+
+			// 상담사 상태변경
+			function OnClickPresenceChange(status)
+			{
+				if (status == "Logout") return
+
+				document.getElementById("status-list").classList.remove('on')
+				softPhone.AgentStatusChange(status)
+			}
+
+			// 다이얼 번호 표시 설정
+			function SetDialpad(value) {
+				var dialnum = document.getElementById("dest-num");
+
+				switch (value)
+				{
+				case 'C': 
+					dialnum.value = '';
+					break;
+				case 'D':
+					dialnum.value = dialnum.value.substr(0, dialnum.value.length-1);
+					break;
+				default:
+					dialnum.value += value;
+
+					// CallPhone 이용중이고, DTMF 송출모드 이면 RTP로 DTMF 송출한다.
+					if (IsCallPhone() && IsDTMFSendMode()) {
+						// 통화상태인 경우 DTMF 전송
+						if (callPhone.HasCall()) callPhone.SendDtmf(value)
+					}
+				}
+			}
+
+			/**************************
+			 * Event 설정
+			 **************************/
+
+			window.onload = function() {
+				// iframe 사용시 parent 쪽에서의 Phone 화면 크기 제어용
+				window.parent.postMessage({ event: 'resize', height: document.body.scrollHeight + "px", width: document.body.scrollWidth + "px" }, '*');
+
+				LoadCTILocalStorage()
+				LoadPhoneLocalStorage()
+			}
+
+			document.addEventListener('mouseup', function(e) {
+				if (popupPad === "") return;
+
+				const container = document.getElementById(popupPad);
+				if (!container) return;
+
+				if (!container.contains(e.target)) {
+					switch (popupPad) {
+					case "dialpad":
+						ShowDialPad(false);
+						break;
+					case "status-list":
+						ShowPresencePad(false);
+						break;
+					}
+				}
+			});
+
+			/*********************
+			 * 공통 버튼 제어
+			 *********************/
+
+			function Login() {
+				// Soft/Call Phone 둘다 미사용 이면 로그인방지
+				if (!(IsSoftPhone() || IsCallPhone())) {
+					SetMessage("please set use, SoftPhone or CallPhone")
+					return;
+				}
+
+				SetMessage("");
+
+				if (IsSoftPhone()) SoftPhoneLogin()
+				if (IsCallPhone()) CallPhoneLogin()
+
+				SaveUsePhoneLocalStorage()
+			}
+
+			function Logout() {
+				SetMessage("");
+
+				if (IsSoftPhone()) SoftPhoneLogout()
+				if (IsCallPhone()) CallPhoneLogout()
+			}
+
+			function GetDialNum() {
+				let el_dn = document.getElementById("dest-num") 
+				return el_dn.value.toString()
+			}
+
+			function IsDTMFSendMode() {
+				let el_dn = document.getElementById("dtmf-use") 
+				return el_dn.checked
+			}
+
+			/*********************
+			 * Soft Phone UI
+			 *********************/
+			var uiConfig = {
+				buttons: {
+					make:       {id: "call"},
+					hold:       {id: "hold"},
+					unhold:     {id: "unhold"},
+					answer:     {id: "answer"},
+					disconnect: {id: "end"},
+					transfer:   {id: "trans"},
+					conference: {id: "conf"},
+					etc:        {id: "etc"},
+				},
+				display: {
+					maxbuttons: 4,
+					moreButtonMode: false,
+					visiblity: {
+						init:   ["make", "hold",   "answer", "disconnect"],
+						idel:   ["make", "hold",   "answer", "disconnect"],
+						alert:  ["make", "hold",   "answer", "disconnect"],
+						dial:   ["make", "hold",   "answer", "disconnect"],
+						active: ["make", "hold",   "answer", "disconnect", "transfer", "conference"],
+						hold:   ["make", "unhold", "answer", "disconnect", "transfer", "conference"],
+					},
+					enable: {
+						init:   [],
+						idel:   ["make"],
+						alert:  ["answer", "disconnect"],
+						dial:   ["disconnect"],
+						active: ["hold", "disconnect", "transfer", "conference"],
+						hold:   ["make", "unhold", "disconnect", "transfer", "conference"],
+					}
+				},
+				fn: {
+					onMakeCall: function() {
+						let destNum = GetDialNum()
+						if (IsSoftPhone()) softPhone.MakeCall(destNum);
+						else if (IsCallPhone()) {
+							if (!callPhone.HasCall()) callPhone.MakeCall(destNum); // Main콜 발신
+							else callPhone.ConsultMakeCall(destNum); // 협의콜 발신
+						}
+					},
+					onHold: function() {
+						if (IsSoftPhone()) softPhone.HoldCall();
+						else if (IsCallPhone()) {
+							if (!callPhone.IsConsultCall()) callPhone.HoldCall();
+							else callPhone.ConsultHoldCall();
+						}
+					},
+					onUnHold: function() {
+						if (IsSoftPhone()) softPhone.UnHoldCall();
+						else if (IsCallPhone()) {
+							if (!callPhone.IsConsultCall()) callPhone.UnHoldCall();
+							else callPhone.ConsultUnHoldCall()
+						}
+					},
+					onAnswer: function() {
+						if (IsSoftPhone()) softPhone.AnswerCall();
+						else if (IsCallPhone()) callPhone.AnswerCall();
+					},
+					onEndCall: function() {
+						if (IsSoftPhone()) softPhone.EndCall();
+						else if (IsCallPhone()) {
+							if (!callPhone.IsConsultCall()) callPhone.EndCall();
+							else callPhone.ConsultEndCall();
+						}
+					},
+					onTransfer: function() {
+						let destNum = GetDialNum()
+						if (IsSoftPhone()) softPhone.TransCall(destNum);
+						else if (IsCallPhone()) {
+							if (!callPhone.IsConsultCall()) callPhone.CallTransfer(destNum)
+							else callPhone.CallTransfer()
+						}
+					},
+					onConference: function() {
+						let destNum = GetDialNum()
+						if (IsSoftPhone()) softPhone.ConfCall(destNum);
+						else if (IsCallPhone()) {
+							// not supported
+						}
+					},
+				},
+			}
+
+			var softphoneUI = new SoftPhoneUI('phone', uiConfig)
+
+			/*********************
+			 * Soft Phone API
+			 *********************/
+
+			var ctiConfig = {
+				fn: {
+					onLoginFail: function(error) {
+						SetLoginButtonStatus(true)
+						msg = error.response?.data?.msg.toString()||error.response?.data.toString()||error.toString()
+						SetMessage(msg)
+					},
+					onRegist: function(isRegi) {
+						if (isRegi) {
+							SetPresenceLED("regi")
+						} else {
+							SetPresenceLED("")
+						}
+					},
+					onUserStatusChanged: function(status) {
+						switch (status)
+						{
+						case Ipron.AGENT_STATE.LOGOUT: 
+							SetLoginButtonStatus(true)
+							SetMessage("")
+							SetPresenceStatus("Logout");
+							SetPresenceLED("")
+
+							softphoneUI.setMoreButtonMode(false);
+
+							ShowPanel("setting")
+							break;
+						case Ipron.AGENT_STATE.LOGIN: 
+							SetMessage("")
+							SetPresenceStatus("NotReady");
+							SetPresenceLED("login")
+
+							ShowPanel("main")
+							break;
+						case Ipron.AGENT_STATE.READY:     SetPresenceStatus("Ready"); break;
+						case Ipron.AGENT_STATE.INREADY:   SetPresenceStatus("InReady"); break;
+						case Ipron.AGENT_STATE.OUTREADY:  SetPresenceStatus("OutReady"); break;
+						case Ipron.AGENT_STATE.NOTREADY:  SetPresenceStatus("NotReady"); break;
+						case Ipron.AGENT_STATE.AFTERWORK: SetPresenceStatus("AfterCallWork"); break;
+						case Ipron.AGENT_STATE.RINGING:   SetPresenceStatus("Ringing"); break;
+						case Ipron.AGENT_STATE.ONLINE:    SetPresenceStatus("Busy"); break;
+						case "assigned":                  SetPresenceStatus("Assigned"); break;
+						}
+					},
+					onCallStatusChanged: function(status) {
+						switch (status)
+						{
+						case "unregi":
+							SetCallStatus("Unregi")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.INIT);
+							break;
+						case "null":
+							SetCallStatus("Idle")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.IDLE);
+							break;
+						case "alerting":
+							SetCallStatus("Ringing")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ALERT);
+							break;
+						case "dialing":
+							SetCallStatus("Dialing")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.DIAL);
+							break;
+						case "connected":
+							SetCallStatus("Connected")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+							break;
+						case "hold":
+							SetCallStatus("Hold")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.HOLD);
+							break;
+						default:
+							SetCallStatus(status)
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.INIT);
+							break;
+						}
+					},
+					onUserInfoChanged: function(user, dn) {
+						SetUserInfo(user);
+						SetLocalNumber(dn);
+					},
+					onMessage: function(msg) {
+						SetMessage(msg)
+					}
+				}
+			}
+
+			var softPhone = new INESoftPhone("phone", ctiConfig)
+
+			function SoftPhoneLogin() {
+				let server = document.getElementById('ip').value;
+				let port = document.getElementById('port').value;
+				let userId = document.getElementById('id').value;
+				let passwd = document.getElementById('passwd').value;
+				let tenant = document.getElementById('tenant').value;
+				let dn = document.getElementById('dn').value;
+
+				SaveCTILocalStorage()
+
+				SetLoginButtonStatus(false)
+				SetMessage("Logging In...")
+
+				softPhone.Login(server, port, tenant, userId, passwd, dn)
+			}
+
+			function SoftPhoneLogout() {
+				SetMessage("Logging out...")
+				softPhone.Logout()
+			}
+
+			/*********************
+			 * Call Phone API
+			 *********************/
+
+			var callPhone = new INECallPhone()
+
+			function CallPhoneLoaded() {
+
+				JsSIP.debug.enable('JsSIP:*');
+
+				// SoftPhone, CallPhone 동시 사용시 SoftPhone 기준 우선 화면처리로 생략
+				if (!IsSoftPhone())
+				{
+					callPhone.on(callPhone.Event.EventNetConnect, null);
+					callPhone.on(callPhone.Event.EventNetDisconnect, null);
+
+					callPhone.on(callPhone.Event.EventRegistered, (data)=>{
+						SetMessage("")
+						SetPresenceStatus("NotReady");
+						SetPresenceLED("regi")
+						SetUserInfo("CALL-PHONE");
+						SetLocalNumber(callPhone.GetDN());
+						SetCallStatus("Idle")
+
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.IDLE);
+
+						EnableDTMFSendMode(true)
+						ShowPanel("main")
+					});
+					callPhone.on(callPhone.Event.EventUnRegistered, (data)=>{
+						SetLoginButtonStatus(true)
+						SetMessage("")
+						SetPresenceStatus("Logout");
+						SetPresenceLED("")
+						SetCallStatus("Init")
+
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.INIT);
+
+						EnableDTMFSendMode(false)
+						ShowPanel("setting")					
+					});
+					callPhone.on(callPhone.Event.EventRegisterFail, null);
+
+					callPhone.on(callPhone.Event.EventCallCreated, (data)=>{
+						SetCallStatus("Init")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.INIT);
+					});
+
+					callPhone.on(callPhone.Event.EventInboundReceived, (data)=>{
+						SetCallStatus("Ringing")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ALERT);
+					});
+
+					callPhone.on(callPhone.Event.EventInboundAccepted, null);
+
+					callPhone.on(callPhone.Event.EventInboundConnected, (data)=>{
+						SetCallStatus("Connected")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+					});
+
+					callPhone.on(callPhone.Event.EventInboundFailed, (data)=>{
+						SetCallStatus("Idle")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.IDLE);
+					});
+
+					callPhone.on(callPhone.Event.EventInboundEnd, (data)=>{
+						SetCallStatus("Idle")
+						softphoneUI.setMoreButtonMode(false);
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.IDLE);
+					});
+
+					callPhone.on(callPhone.Event.EventOutboundProgress, (data)=>{
+						SetCallStatus("Dialing")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.DIAL);
+					});
+
+					callPhone.on(callPhone.Event.EventOutboundAccepted, null);
+
+					callPhone.on(callPhone.Event.EventOutboundConnected, (data)=>{
+						SetCallStatus("Connected")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+					});
+
+					callPhone.on(callPhone.Event.EventOutboundFailed, (data)=>{
+						if (callPhone.HasCall()) {
+							SetCallStatus("Connected")
+							softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+							return
+						}
+						SetCallStatus("Idle")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.IDLE);
+					});
+
+					callPhone.on(callPhone.Event.EventOutboundEnd, (data)=>{
+						softphoneUI.setMoreButtonMode(false);
+						if (callPhone.HasCall()) {
+							// 1차콜이 존재하는 경우 Hold 상태이면 Hold를 해제한다.
+							if (callPhone.IsLocalHold()) {
+								SetCallStatus("Hold")
+								softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.HOLD);
+								callPhone.UnHoldCall()
+							} else {
+								SetCallStatus("Connected")
+								softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+							}
+							return
+						}
+						SetCallStatus("Idle")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.IDLE);
+					});
+
+					callPhone.on(callPhone.Event.EventConsultElevated, (direction)=>{
+						SetCallStatus("Connected")
+						softphoneUI.setMoreButtonMode(false);
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+					});
+
+					callPhone.on(callPhone.Event.EventTransferReqSuccess, null);
+					callPhone.on(callPhone.Event.EventTransferReqFailed, null);
+
+					callPhone.on(callPhone.Event.EventTransferProgress, null);
+					callPhone.on(callPhone.Event.EventTransferAccepted, null);
+					callPhone.on(callPhone.Event.EventTransferFailed, null);
+
+					callPhone.on(callPhone.Event.EventTransfer, null);
+
+					callPhone.on(callPhone.Event.EventNotify, null);
+
+					callPhone.on(callPhone.Event.EventReinviteReceived, null);
+					callPhone.on(callPhone.Event.EventReinviteAccepted, null);
+					callPhone.on(callPhone.Event.EventReinviteFailed, null);
+					callPhone.on(callPhone.Event.EventReinviteAckReceived, null);
+
+					callPhone.on(callPhone.Event.EventHold, (data)=>{
+						SetCallStatus("Hold")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.HOLD);
+					});
+
+					callPhone.on(callPhone.Event.EventUnHold, (data)=>{
+						SetCallStatus("Connected")
+						softphoneUI.refreshCallBtn(SoftPhoneUI.UI_STATE.ACTIVE);
+					});
+				}
+
+				window.addEventListener("beforeunload", function (e){
+					callPhone.UnInit();
+				});
+
+				// WebSocket 연결
+				websip.sockConnect();
+				// SIP Register 시작 (WebSocket 미연결시 자동연결)
+				websip.sipRegister();
+			}
+
+			function CallPhoneLogin() {
+				let dn = document.getElementById('call-dn').value
+				let tenant = document.getElementById('call-tenant').value
+				let sipIp = document.getElementById('sip-ip').value
+				let sipPort = document.getElementById('sip-port').value
+				let sipDomain = document.getElementById('sip-domain').value
+				let sipRegExpire = document.getElementById('sip-regexpire').value
+				let iceIp1 = document.getElementById('ice-ip1').value
+				let icePort1 = document.getElementById('ice-port1').value
+				let iceIp2 = document.getElementById('ice-ip2').value
+				let icePort2 = document.getElementById('ice-port2').value
+				let iceId1 = document.getElementById('ice-id1').value
+				let icePwd1 = document.getElementById('ice-pwd1').value
+				let iceId2 = document.getElementById('ice-id2').value
+				let icePwd2 = document.getElementById('ice-pwd2').value
+	
+				let phoneConfig = {
+					dn:     dn,
+					md5Id:  '',
+					md5Pwd: '',
+					sipServer: `wss://${sipIp}:${sipPort}`,
+					sipDomain: `${sipDomain || sipIp + ':' + sipPort}`,
+					regExpire: sipRegExpire,
+					iceServer: [
+						{ turnAddress: `${iceIp1}:${icePort1}`, turnId: iceId1, turnPasswd: icePwd1 },
+						{ turnAddress: `${iceIp2}:${icePort2}`, turnId: iceId2, turnPasswd: icePwd2 },
+					],
+					userAgent: "IPRON-NE SoftPhone 1.0",
+					audioInElementID:  'audioSource',
+					audioOutElementID: 'audioOutput',
+				}
+
+				SavePhoneLocalStorage()
+
+				callPhone.Init(phoneConfig, CallPhoneLoaded)
+			}
+
+			function CallPhoneLogout() {
+				websip.sipUnregister();
+				websip.sockClose();
+			}
+
+
+		</script>
+
+	</body>
+</html>

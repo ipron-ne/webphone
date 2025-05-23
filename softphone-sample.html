@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>IPRON Browser Phone</title>
+	</head>
+	<body>
+		<div>
+			<iframe id="softphone" allow="camera *; microphone *" src="softphone.html"></iframe>
+		</div>
+	</body>
+	<style>
+		#softphone {
+			float: right;
+			border-style: none;
+		}
+	</style>
+	<script>
+		window.addEventListener('message', function(e) {
+			switch (e.data.event)
+			{
+			case "resize":
+				document.getElementById('softphone').height = e.data.height;
+				document.getElementById('softphone').width = e.data.width;
+				break;
+			case "event":
+			}
+		})
+	</script>
+</html>
