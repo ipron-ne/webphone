@@ -323,10 +323,8 @@ class INESoftPhone {
      * @param {string} dn - DN (Directory Number)
      * @returns {Promise<void>}
      */
-    async Login(server, port, tenant, userId, passwd, dn) {
-        const defaultPort = "80";
-        const effectivePort = port || defaultPort; // port가 비어있으면 기본값 사용
-        const baseUrl = `http://${server}:${effectivePort}`; // 프로토콜은 http로 하드코딩되어 있음
+    async Login(url, tenant, userId, passwd, dn) {
+        const baseUrl = `${url}`; // 프로토콜은 http로 하드코딩되어 있음
         const timeout = 5000; // 예시 타임아웃 값
         const isDebug = true; // 예시 디버그 설정
 
