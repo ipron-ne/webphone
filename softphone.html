@@ -647,7 +647,7 @@ input.switchbox[type="checkbox"]+label {
 							Softphone
 						</legend>
 						<div>
-							<label>API G/W URL</label>
+							<label>API URL</label>
 							<div>
 								<input type="text" size="22" name="api-url" id="api-url" placeholder="CTI API 서버IP" pattern=""/>
 							</div>
@@ -1451,8 +1451,7 @@ input.switchbox[type="checkbox"]+label {
 			var softPhone = new INESoftPhone("phone", ctiConfig)
 
 			function SoftPhoneLogin() {
-				let server = document.getElementById('api-url').value;
-				let port = document.getElementById('port').value;
+				let url = document.getElementById('api-url').value;
 				let userId = document.getElementById('id').value;
 				let passwd = document.getElementById('passwd').value;
 				let tenant = document.getElementById('tenant').value;
@@ -1463,7 +1462,7 @@ input.switchbox[type="checkbox"]+label {
 				SetLoginButtonStatus(false)
 				SetMessage("Logging In...")
 
-				softPhone.Login(server, tenant, userId, passwd, dn)
+				softPhone.Login(url, tenant, userId, passwd, dn)
 			}
 
 			function SoftPhoneLogout() {
