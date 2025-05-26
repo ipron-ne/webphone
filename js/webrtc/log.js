@@ -1,19 +1,35 @@
-
-    function grmpad(n, width){
+function grmpad(n, width){
 		n = n + '';
 		return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
     }
 
+    var logBuffer = [];
+    var logUpdateScheduled = false;
+
+    function flushLogBuffer() {
+        if (logBuffer.length > 0) {
+            var log = document.getElementById("logarea");
+            log.value += logBuffer.join("");
+            log.scrollTop = log.scrollHeight;
+            logBuffer = [];
+        }
+        logUpdateScheduled = false;
+    }
+
     function grmlogwrite(text){
-		var log = document.getElementById("logarea");
 		var date = new Date();
-		log.value += "[" + grmpad(date.getHours(),2) +
+		var formattedMessage = "[" + grmpad(date.getHours(),2) +
 					 ":" + grmpad(date.getMinutes(),2) +
 					 ":" + grmpad(date.getSeconds(),2) +
 					 "." + grmpad(date.getMilliseconds(),3) + "] ";
-		log.value += text;
-		log.value += "\n";
-		log.scrollTop = log.scrollHeight;
+		formattedMessage += text;
+		formattedMessage += "\n";
+        logBuffer.push(formattedMessage);
+
+        if (!logUpdateScheduled) {
+            logUpdateScheduled = true;
+            requestAnimationFrame(flushLogBuffer);
+        }
     }
 
     function grmlogClear(){

@@ -6,6 +6,14 @@
  * INESoftPhone 클래스는 Ipron SDK와 연동하여 소프트폰 UI를 제어하고 통화 기능을 수행합니다.
  */
 
+function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
 class SoftPhoneUI {
     /** @type {object} */
     config = null;
@@ -87,13 +95,15 @@ class SoftPhoneUI {
 
     constructor(el, config) {
         this.config = Object.assign({}, this.defConfig, config);
+        this.dom_elements = {};
 
-        // 설정된 버튼에 이벤트 리스너를 등록합니다.
-        for (const key in config.buttons) {
-            const buttonConfig = config.buttons[key];
+        // 설정된 버튼에 이벤트 리스너를 등록하고 DOM 요소를 캐시합니다.
+        for (const key in this.config.buttons) {
+            const buttonConfig = this.config.buttons[key];
             const el_btn = buttonConfig ? document.getElementById(buttonConfig.id) : null;
-
+            
             if (el_btn) {
+                this.dom_elements[key] = el_btn; // DOM 요소 캐시
                 const handler = this.buttonHandlers[key];
                 if (handler && typeof handler === 'function') {
                     // 화살표 함수를 사용하여 'this'가 INESoftPhone 인스턴스를 가리키도록 바인딩합니다.
@@ -101,22 +111,18 @@ class SoftPhoneUI {
                 }
             }
         }
+        
+        // Create a debounced version of the refresh logic
+        this._debouncedInternalRefresh = debounce(this._internalRefreshCallBtn.bind(this), 100); // 100ms delay
+        this.refreshCallBtn(SoftPhoneUI.UI_STATE.INIT); // Initial call
     }
 
     /********************
      * 화면 제어 함수
      ********************/
 
-    setMoreButtonMode(enable) {
-        this.config.display.moreButtonMode = enable
-        this.refreshCallBtn(this.config.display.currentState);
-    }
-
-    /**
-     * 현재 통화 상태에 따라 버튼의 표시 여부와 활성화 상태를 제어합니다.
-     * @param {string} state - 현재 UI 상태 (INESoftPhone.UI_STATE 사용 권장)
-     */
-    refreshCallBtn(state) {
+    // New method to contain the original logic
+    _internalRefreshCallBtn(state) {
         if (!this.config?.buttons || !this.config.display?.visiblity || !this.config.display?.enable) {
             console.warn("Config for buttons or display states is missing.");
             return;
@@ -131,7 +137,7 @@ class SoftPhoneUI {
 
         for (const key in this.config.buttons) {
             const buttonConfig = this.config.buttons[key];
-            const el = buttonConfig ? document.getElementById(buttonConfig.id) : null;
+            const el = this.dom_elements[key]; // 캐시된 요소 사용
 
             if (el) {
 
@@ -152,11 +158,25 @@ class SoftPhoneUI {
             }
         }
 
-        const el = document.getElementById(this.config.buttons.etc.id);
+        const el = this.dom_elements.etc; // 'etc' 버튼도 캐시에서 가져옴
         let etcVisible = (moreButtonMode || this.config.display.maxbuttons < dispCount);
 
         el.hidden = !etcVisible
         el.disabled = !etcVisible
+    }
+
+    setMoreButtonMode(enable) {
+        this.config.display.moreButtonMode = enable
+        this.refreshCallBtn(this.config.display.currentState);
+    }
+
+    /**
+     * 현재 통화 상태에 따라 버튼의 표시 여부와 활성화 상태를 제어합니다.
+     * @param {string} state - 현재 UI 상태 (INESoftPhone.UI_STATE 사용 권장)
+     */
+    refreshCallBtn(state) {
+        // Call the debounced version
+        this._debouncedInternalRefresh(state);
     }
 
     /********************
