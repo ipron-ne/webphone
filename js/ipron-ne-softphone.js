@@ -8,6 +8,14 @@
 
 'use strict';
 
+function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
 class INESoftPhone {
     /** @type {object} */
     config = null;
@@ -49,6 +57,14 @@ class INESoftPhone {
         this.config = Object.assign({}, this.defConfig, config);
         this.session = new INESoftPhone.SessionManager(); // SessionManager 인스턴스 생성
 
+        // Debounce UI-updating callbacks if they are provided
+        if (this.config.fn.onCallStatusChanged) {
+            this._debouncedOnCallStatusChanged = debounce(this.config.fn.onCallStatusChanged, 100); // 100ms delay
+        }
+        if (this.config.fn.onUserStatusChanged) {
+            this._debouncedOnUserStatusChanged = debounce(this.config.fn.onUserStatusChanged, 100);
+        }
+
         this.refreshCallStatus(); // 콜 상태 표시
 
     }
@@ -62,8 +78,10 @@ class INESoftPhone {
      * @param {string} msg - 표시할 통화 상태 메시지
      */
     setCallStatus(status) {
-        if (this.config?.fn?.onCallStatusChanged) {
-            this.config.fn.onCallStatusChanged(status);
+        if (this._debouncedOnCallStatusChanged) {
+            this._debouncedOnCallStatusChanged(status);
+        } else if (this.config?.fn?.onCallStatusChanged) { // Fallback if not debounced (e.g. no callback provided)
+           this.config.fn.onCallStatusChanged(status);
         }
     }
 
@@ -72,8 +90,10 @@ class INESoftPhone {
      * @param {string} status - 표시할 사용자 상태
      */
     setUserStatus(status) {
-        if (this.config?.fn?.onUserStatusChanged) {
-            this.config.fn.onUserStatusChanged(status);
+        if (this._debouncedOnUserStatusChanged) {
+            this._debouncedOnUserStatusChanged(status);
+        } else if (this.config?.fn?.onUserStatusChanged) { // Fallback
+           this.config.fn.onUserStatusChanged(status);
         }
     }
 
