@@ -58,12 +58,12 @@ class INESoftPhone {
         this.session = new INESoftPhone.SessionManager(); // SessionManager 인스턴스 생성
 
         // Debounce UI-updating callbacks if they are provided
-        if (this.config.fn.onCallStatusChanged) {
-            this._debouncedOnCallStatusChanged = debounce(this.config.fn.onCallStatusChanged, 100); // 100ms delay
-        }
-        if (this.config.fn.onUserStatusChanged) {
-            this._debouncedOnUserStatusChanged = debounce(this.config.fn.onUserStatusChanged, 100);
-        }
+        // if (this.config.fn.onCallStatusChanged) {
+        //     this._debouncedOnCallStatusChanged = debounce(this.config.fn.onCallStatusChanged, 100); // 100ms delay
+        // }
+        // if (this.config.fn.onUserStatusChanged) {
+        //     this._debouncedOnUserStatusChanged = debounce(this.config.fn.onUserStatusChanged, 100);
+        // }
 
         this.refreshCallStatus(); // 콜 상태 표시
 
