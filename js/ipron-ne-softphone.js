@@ -81,7 +81,7 @@ class INESoftPhone {
         if (this._debouncedOnCallStatusChanged) {
             this._debouncedOnCallStatusChanged(status);
         } else if (this.config?.fn?.onCallStatusChanged) { // Fallback if not debounced (e.g. no callback provided)
-           this.config.fn.onCallStatusChanged(status);
+            this.config.fn.onCallStatusChanged(status);
         }
     }
 
@@ -90,10 +90,10 @@ class INESoftPhone {
      * @param {string} status - 표시할 사용자 상태
      */
     setUserStatus(status) {
-        if (this._debouncedOnUserStatusChanged) {
+       if (this._debouncedOnUserStatusChanged) {
             this._debouncedOnUserStatusChanged(status);
         } else if (this.config?.fn?.onUserStatusChanged) { // Fallback
-           this.config.fn.onUserStatusChanged(status);
+            this.config.fn.onUserStatusChanged(status);
         }
     }
 

@@ -1,9 +1,10 @@
-function grmpad(n, width){
+
+    function grmpad(n, width){
 		n = n + '';
 		return n.length >= width ? n : new Array(width - n.length + 1).join('0') + n;
     }
 
-    var logBuffer = [];
+	var logBuffer = [];
     var logUpdateScheduled = false;
 
     function flushLogBuffer() {
@@ -24,9 +25,9 @@ function grmpad(n, width){
 					 "." + grmpad(date.getMilliseconds(),3) + "] ";
 		formattedMessage += text;
 		formattedMessage += "\n";
-        logBuffer.push(formattedMessage);
+		logBuffer.push(formattedMessage);
 
-        if (!logUpdateScheduled) {
+		if (!logUpdateScheduled) {
             logUpdateScheduled = true;
             requestAnimationFrame(flushLogBuffer);
         }

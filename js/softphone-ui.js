@@ -101,7 +101,7 @@ class SoftPhoneUI {
         for (const key in this.config.buttons) {
             const buttonConfig = this.config.buttons[key];
             const el_btn = buttonConfig ? document.getElementById(buttonConfig.id) : null;
-            
+
             if (el_btn) {
                 this.dom_elements[key] = el_btn; // DOM 요소 캐시
                 const handler = this.buttonHandlers[key];
@@ -111,7 +111,7 @@ class SoftPhoneUI {
                 }
             }
         }
-        
+
         // Create a debounced version of the refresh logic
         this._debouncedInternalRefresh = debounce(this._internalRefreshCallBtn.bind(this), 100); // 100ms delay
         this.refreshCallBtn(SoftPhoneUI.UI_STATE.INIT); // Initial call
@@ -121,6 +121,10 @@ class SoftPhoneUI {
      * 화면 제어 함수
      ********************/
 
+    /**
+     * 현재 통화 상태에 따라 버튼의 표시 여부와 활성화 상태를 제어합니다.
+     * @param {string} state - 현재 UI 상태 (INESoftPhone.UI_STATE 사용 권장)
+     */
     // New method to contain the original logic
     _internalRefreshCallBtn(state) {
         if (!this.config?.buttons || !this.config.display?.visiblity || !this.config.display?.enable) {
