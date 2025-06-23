@@ -720,7 +720,7 @@ class INESoftPhone {
                 break;
             case Ipron.EVENT.TYPE.CALL?.DISCONNECTED: // 통화 끊어짐
                  // 현재 사용자의 통화 끊김 이벤트 발생 시 세션에서 통화 제거
-                 if (isCurrentUserEvent) {
+                 if (isCurrentUserEvent && e.eventEpId === e.epId) {
                      this.session.delCall(e.callId, e.connId);
                      stateChanged = true; // UI 상태 변경 필요 (예: IDLE)
                      console.log('Call Disconnected.');
